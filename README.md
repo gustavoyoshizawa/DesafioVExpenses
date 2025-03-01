@@ -11,7 +11,7 @@ provider "aws" {
 ```
 
 ### Variáveis de Projeto e Candidato
-Define variáveis para armazenar o nome do projeto (VExpenses) e do candidato (Gustavo). Elas são usadas para nomear recursos dinamicamente.
+Define variáveis para armazenar o nome do projeto e do candidato. Elas são usadas para nomear recursos dinamicamente.
 ```hcl
 variable "projeto" {
   description = "Nome do projeto"
