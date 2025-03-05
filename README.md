@@ -114,7 +114,7 @@ Saída: Permite todo tráfego de saída sem restrições.
 ### ❌Acesso SSH irrestrito
 O código permite acesso SSH de qualquer IP (0.0.0.0/0), o que representa um risco de segurança.
 
-###❌Falta de suporte para HTTP e HTTPS
+### ❌Falta de suporte para HTTP e HTTPS
 A configuração do grupo de segurança não permite tráfego HTTP e HTTPS, impedindo o acesso à aplicação via navegador.
 
 ```hcl
