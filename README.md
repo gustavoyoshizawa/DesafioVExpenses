@@ -380,5 +380,4 @@ Caso queira excluir todos os recursos provisionados, basta rodar o seguinte coma
 ```bash
 terraform destroy -auto-approve
 ```
-Isso removerá a instância EC2 e demais recursos criados pelo Terraform.
 ---
