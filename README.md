@@ -196,3 +196,89 @@ output "ec2_public_ip" {
 }
 ```
 
+
+## Tarefa 2
+
+### Melhorando o código
+
+### ✅ Restrição do acesso SSH a um IP específico
+Agora, o SSH só pode ser acessado de um IP definido na variável `ssh_cidr`.
+
+### ✅ Adição de suporte para HTTP e HTTPS
+O grupo de segurança permite acesso via navegador.
+
+```terraform
+variable "ssh_cidr" {
+  description = "CIDR do IP autorizado para acesso SSH"
+  type        = string
+  default     = "152.244.41.225/32" # IP do meu computador
+}
+
+resource "aws_security_group" "sg" {
+  name        = "meu_sg"
+  description = "Regras de segurança para a EC2"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.ssh_cidr] #  SSH restrito a um IP específico
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # HTTP liberado para acesso público
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # HTTPS liberado para acesso público
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+````
+
+### ✅ Armazenamento seguro da chave privada
+A chave privada agora é salva localmente com permissões adequadas.
+
+```terraform
+resource "tls_private_key" "chave_ssh" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "local_file" "chave_privada" {
+  filename      = "chave-privada.pem"
+  content       = tls_private_key.chave_ssh.private_key_pem
+  file_permission = "0400" # Permissão segura para a chave
+}
+
+resource "aws_key_pair" "chave" {
+  key_name   = "minha-chave"
+  public_key = tls_private_key.chave_ssh.public_key_openssh
+}
+```
+
+### ✅ Instalação automática do Nginx na EC2
+Agora, a EC2 já inicia com o Nginx instalado.
+
+```terraform
+user_data = <<-EOF
+  #!/bin/bash
+  apt-get update -y
+  apt-get upgrade -y
+  apt-get install -y nginx
+  systemctl enable nginx
+  systemctl start nginx
+  EOF
+```
