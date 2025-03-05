@@ -275,10 +275,110 @@ Agora, a EC2 já inicia com o Nginx instalado.
 ```terraform
 user_data = <<-EOF
   #!/bin/bash
-  apt-get update -y
-  apt-get upgrade -y
-  apt-get install -y nginx
-  systemctl enable nginx
-  systemctl start nginx
+    apt-get update -y
+    while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 1; done
+    apt-get upgrade -y
+    apt-get install -y nginx
+    systemctl enable nginx
+    systemctl start nginx
   EOF
 ```
+
+## **Pré-requisitos**
+Antes de iniciar, certifique-se de que possui os seguintes requisitos instalados e configurados:
+
+- **Terraform**: Instalado e configurado corretamente.
+- **AWS CLI**: Configurado com suas credenciais de acesso.
+- **Conta AWS**: Permissões para criar instâncias EC2, configurar regras de segurança e gerenciar VPCs.
+
+---
+
+## **Passo a passo**
+
+### **1. Clone o repositório**
+Para começar, baixe o código do repositório:
+
+```bash
+git clone https://github.com/gustavoyoshizawa/DesafioVExpenses
+```
+
+Acesse o diretório do projeto:
+
+```bash
+cd DesafioVExpenses
+```
+
+### **2. Inicialize o Terraform**
+Antes de aplicar as configurações, inicialize o Terraform no diretório do projeto:
+
+```bash
+terraform init
+```
+
+### **3. Revise o plano de execução**
+Antes de criar os recursos, verifique o que será provisionado:
+
+```bash
+terraform plan
+```
+
+### **4. Aplique o plano para criar os recursos**
+Agora, execute o seguinte comando para criar a infraestrutura:
+
+```bash
+terraform apply -auto-approve
+```
+
+Isso provisionará uma instância EC2 com o Nginx instalado e configurado.
+
+### **5. Acesse a instância EC2 via SSH**
+Após a criação, pegue o IP público da instância e conecte-se via SSH:
+
+```bash
+ssh -i "chave-privada.pem" admin@ec2-3-235-88-142.compute-1.amazonaws.com -p 22
+```
+
+### **6. Verifique se o servidor está rodando**
+Dentro da instância, execute o comando:
+
+```bash
+systemctl status nginx
+```
+
+Se o Nginx estiver ativo e rodando, você verá uma saída indicando que o serviço está funcionando corretamente.
+
+### **7. Acesse a aplicação via navegador**
+Abra seu navegador e acesse:
+
+```
+http://<IP_DA_INSTÂNCIA>
+```
+![alt text](img/ec2.jpeg)
+
+Se tudo estiver correto, você verá a página personalizada.
+
+### **8. (Opcional) Editar o conteúdo do site**
+Se precisar alterar o conteúdo da página HTML, edite o arquivo diretamente na instância:
+
+```bash
+sudo nano /var/www/html/index.html
+```
+![alt text](img/nginx.jpeg)
+
+Após fazer as alterações, salve (`Ctrl + O` e `Enter`) e saia (`Ctrl + X`).
+
+Reinicie o Nginx para aplicar as mudanças:
+
+```bash
+sudo systemctl restart nginx
+```
+---
+
+## **Remover a infraestrutura**
+Caso queira excluir todos os recursos provisionados, basta rodar o seguinte comando:
+
+```bash
+terraform destroy -auto-approve
+```
+Isso removerá a instância EC2 e demais recursos criados pelo Terraform.
+---
