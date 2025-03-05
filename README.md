@@ -110,6 +110,13 @@ resource "aws_route_table_association" "main_association" {
 Cria um Security Group para controlar o tráfego da instância EC2.
 Entrada: Permite conexões SSH (porta 22) de qualquer IP.
 Saída: Permite todo tráfego de saída sem restrições.
+
+### ❌Acesso SSH irrestrito
+O código permite acesso SSH de qualquer IP (0.0.0.0/0), o que representa um risco de segurança.
+
+###❌Falta de suporte para HTTP e HTTPS
+A configuração do grupo de segurança não permite tráfego HTTP e HTTPS, impedindo o acesso à aplicação via navegador.
+
 ```hcl
 resource "aws_security_group" "main_sg" {
   name        = "${var.projeto}-${var.candidato}-sg"
@@ -169,6 +176,10 @@ Configura uma instância EC2 com as seguintes características:
 
 ### Outputs
 Exibe a chave privada SSH.
+
+### ❌Falta de armazenamento local da chave privada
+O código exibe a chave privada, mas sem armazená-la adequadamente no sistema de arquivos.
+
 ```hcl
 output "private_key" {
   description = "Chave privada para acessar a instância EC2"
